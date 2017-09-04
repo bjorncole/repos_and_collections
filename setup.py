@@ -2,11 +2,11 @@
 
 from distutils.core import setup
 
-setup(name='Multiple Repo Coordinator',
-      version='0.1',
+setup(name='repos_and_collections',
+      version='0.11',
       description='Python Distribution Utilities',
       author='Bjorn Cole',
       author_email='',
       url='',
-      packages=['multi_repo'],
+      packages=['repos_and_collections'],
      )
