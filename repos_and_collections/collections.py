@@ -1,6 +1,7 @@
 import uuid
 from uuid import UUID
 import inspect
+from lxml import etree
 
 class Collection(object):
     '''
@@ -129,4 +130,3 @@ class CollectionMap():
     def __init__(self):
         self.collection_A_to_collection_B_map = {}
         self.collection_B_to_collection_A_map = {}
-
