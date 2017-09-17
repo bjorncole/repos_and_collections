@@ -13,6 +13,7 @@ class Collection(object):
         self.id_to_object_map = {}
         self.object_to_id_map = {}
         self.collected_objects = []
+        self.name = ''
 
     def __len__(self):
         return len(self.collected_objects)
@@ -32,6 +33,20 @@ class Collection(object):
         self.id_to_object_map.update({new_id: added_object})
 
         self.object_to_id_map.update({hex(id(added_object)): new_id})
+
+        self.collected_objects.append(added_object)
+
+    def add_object_to_collection_with_id(self, added_object, id_to_use):
+        '''
+        Add an object to the collection and assign it a unique id
+        :param added_object: object to add to the collection
+        :param id_to_use: id to apply to the addition
+        :return: None
+        '''
+
+        self.id_to_object_map.update({id_to_use: added_object})
+
+        self.object_to_id_map.update({hex(id(added_object)): id_to_use})
 
         self.collected_objects.append(added_object)
 

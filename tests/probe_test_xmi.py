@@ -1,4 +1,5 @@
 from repos_and_collections.xmi_objects import XMICollectionSet
+from pprint import PrettyPrinter
 
 def main():
 
@@ -10,9 +11,12 @@ def main():
     xmi_collect = XMICollectionSet()
     xmi_tree = xmi_collect.load_from_file('../test_data/Transfer Tests Round 3.xml')
 
-    #pp = pprint.PrettyPrinter(indent=2)
+    pp = PrettyPrinter(indent=2)
 
     #root = xmi_tree.getroot()
+
+    for collection in xmi_collect.collection_list:
+        pp.pprint(collection.id_to_object_map)
 
     #for child in root:
     #    split_tag = etree.QName(child.tag)
