@@ -2,6 +2,7 @@ import uuid
 from uuid import UUID
 import inspect
 from lxml import etree
+import copy
 
 class Collection(object):
     '''
@@ -101,9 +102,36 @@ class Collection(object):
         obj = self.id_to_object_map[id_of_obj_to_resolve]
 
         for attr in inspect.getmembers(obj):
-            if attr[0][0] != '_' and isinstance(attr[1], UUID):
-                obj_to_resolve = self.id_to_object_map[attr[1]]
-                obj.__setattr__(attr[0], obj_to_resolve)
+            if attr[0][0] != '_' and attr[0] != 'name' and attr[0] != 'literals_cache' \
+                    and attr[0] != 'references_cache' and (isinstance(attr[1], UUID) \
+                    or isinstance(attr[1], str) or isinstance(attr[1], list)):
+                if not isinstance(attr[1], list):
+
+                    try:
+                        #print('Looking to resolve id ' + str(attr[1]) + ' for property ' + attr[0])
+                        obj_to_resolve = self.id_to_object_map[attr[1]]
+                        obj.__setattr__(attr[0], obj_to_resolve)
+                    # if general strings are accepted, they may not be in the map
+                    except KeyError:
+                        print('Failed')
+                        pass
+
+                else:
+                    new_list = copy.deepcopy(attr[1])
+                    #print('New list is ' + repr(new_list))
+                    for item in attr[1]:
+                        if (isinstance(item, UUID) or isinstance(item, str)):
+                            try:
+                                #print('Looking to resolve id ' + item + ' for property ' + attr[0])
+                                obj_to_resolve = self.id_to_object_map[item]
+                                new_list.append(obj_to_resolve)
+                                new_list.remove(item)
+                            # if general strings are accepted, they may not be in the map
+                            except KeyError:
+                                #print('Failed')
+                                #new_list.append(item)
+                                pass
+                    obj.__setattr__(attr[0], new_list)
 
     def dereference_links(self, id_of_obj_to_deref):
         '''
@@ -132,7 +160,9 @@ class Collection(object):
         obj_dict = {}
 
         for prop in inspect.getmembers(obj):
-            if prop[0][0] != '_':
+            if prop[0][0] != '_' and not callable(prop[1]) and \
+                prop[0] != 'literals_cache' and prop[0] != 'references_cache' and \
+                    prop[0].find('__meta') == -1:
                 obj_dict.update({prop[0]: repr(prop[1])})
 
         return obj_dict

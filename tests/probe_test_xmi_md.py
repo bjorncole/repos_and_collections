@@ -9,7 +9,7 @@ def main():
     '''
 
     xmi_collect = XMICollectionSet()
-    xmi_tree = xmi_collect.load_from_file('../test_data/BIOS_Boot Papyrus.xml')
+    xmi_tree = xmi_collect.load_from_file('../test_data/Transfer Tests Round 3.xml')
 
     pp = PrettyPrinter(indent=2)
 
