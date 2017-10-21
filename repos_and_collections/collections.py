@@ -108,7 +108,7 @@ class Collection(object):
                 if not isinstance(attr[1], list):
 
                     try:
-                        #print('Looking to resolve id ' + str(attr[1]) + ' for property ' + attr[0])
+                        print('Looking to resolve id ' + str(attr[1]) + ' for property ' + attr[0])
                         obj_to_resolve = self.id_to_object_map[attr[1]]
                         obj.__setattr__(attr[0], obj_to_resolve)
                     # if general strings are accepted, they may not be in the map
@@ -118,20 +118,23 @@ class Collection(object):
 
                 else:
                     new_list = copy.deepcopy(attr[1])
-                    #print('New list is ' + repr(new_list))
+                    touched = False
+                    print('New list is ' + repr(new_list))
                     for item in attr[1]:
                         if (isinstance(item, UUID) or isinstance(item, str)):
                             try:
-                                #print('Looking to resolve id ' + item + ' for property ' + attr[0])
+                                print('Looking to resolve id ' + item + ' for property ' + attr[0])
                                 obj_to_resolve = self.id_to_object_map[item]
                                 new_list.append(obj_to_resolve)
                                 new_list.remove(item)
+                                touched = True
                             # if general strings are accepted, they may not be in the map
                             except KeyError:
                                 #print('Failed')
                                 #new_list.append(item)
                                 pass
-                    obj.__setattr__(attr[0], new_list)
+                    if touched:
+                        obj.__setattr__(attr[0], new_list)
 
     def dereference_links(self, id_of_obj_to_deref):
         '''

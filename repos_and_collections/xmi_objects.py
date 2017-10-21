@@ -5,6 +5,8 @@ from lxml import etree
 from deep_metamodeling.metamodels.m2_uml import Class, Property, Association, AssociationClass
 from repos_and_collections.collections import Collection
 
+from pprint import PrettyPrinter
+
 class XMICollectionSet(object):
     '''
     A collection with tailored methods for loading, saving, and handling XMI
@@ -62,7 +64,7 @@ class XMICollectionSet(object):
                                 new_thing = Class()
                                 added_properties = self.collect_attributes(packedElement)
                                 for added_prop in added_properties:
-                                    added_properties[added_prop].class_ = new_thing
+                                    new_thing.owned_attribute.append(added_properties[added_prop])
                             elif packedElement.attrib[attribute] == 'uml:Association':
                                 new_thing = Association()
                                 added_properties = self.collect_attributes(packedElement)
@@ -87,6 +89,13 @@ class XMICollectionSet(object):
         # them live
         # Note that some references will remain unresolved because their targets are in a different collection
         # (package)
+
+        pp = PrettyPrinter(indent=2)
+
+        for package in self.collection_list:
+            print('Object in ' + package.name)
+            for collected in package.id_to_object_map:
+                pp.pprint(package.dump_obj_as_dict(collected))
 
 
         for package in self.collection_list:
