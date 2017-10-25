@@ -1,7 +1,8 @@
 from repos_and_collections.excel_objects import ExcelCollectionSet
 from pprint import PrettyPrinter
-from deep_metamodeling.metamodels.m2_uml import Class, Property, Association, AssociationClass
+from deep_metamodeling.metamodels.m2_uml import Class, Property, Association, AssociationClass, CompositionGraph
 from repos_and_collections.collections import Collection
+import networkx as nx
 
 def main():
 
@@ -34,27 +35,34 @@ def main():
     prop3 = Property()
     prop4 = Property()
     prop5 = Property()
+    prop6 = Property()
 
     prop1.name = 'front right'
     prop2.name = 'front left'
     prop3.name = 'rear right'
     prop4.name = 'rear left'
     prop5.name = 'diameter'
+    prop6.name = 'radius'
 
     class1.owned_attribute.append(prop1)
     class1.owned_attribute.append(prop2)
     class1.owned_attribute.append(prop3)
-    class2.owned_attribute.append(prop4)
+    class1.owned_attribute.append(prop4)
 
-    class1.owned_attribute.append(prop5)
+    class2.owned_attribute.append(prop5)
 
-    for collection in xmi_collect.collection_list:
-        pp.pprint(collection.id_to_object_map)
+    prop1.type_.append(class2)
+    prop2.type_.append(class2)
+    prop3.type_.append(class2)
+    prop4.type_.append(class2)
 
-    for package in xmi_collect.collection_list:
-        print('Object in ' + package.name)
-        for collected in package.id_to_object_map:
-            pp.pprint(package.dump_obj_as_dict(collected))
+    test_graph = CompositionGraph(class1)
+
+    pp.pprint(list(test_graph.comp_graph.edges()))
+
+    pp.pprint(list(nx.topological_sort(test_graph.comp_graph)))
+
+    pp.pprint(nx.out_degree_centrality(test_graph.comp_graph))
 
     #for child in root:
     #    split_tag = etree.QName(child.tag)

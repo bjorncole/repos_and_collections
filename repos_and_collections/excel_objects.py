@@ -3,6 +3,7 @@
 import xlwings as xl
 import inspect
 import networkx as nw
+from collections import Collection
 
 class ExcelCollectionSet(object):
     '''
@@ -21,6 +22,19 @@ class ExcelCollectionSet(object):
 
         max_graph_depth = 0
 
+class ExcelCollection(Collection):
+
+    '''
+    Represents a collection of Excel objects (serializes as a single sheet)
+    '''
+
+    def __init__(self):
+        super().__init__()
+        # if true, put graph on first columns of sheet, if false put graph
+        # on first rows of sheet
+        self.row_headers = False
+
+
 class ExcelCellPath(object):
     '''
     A convenience class for calculating and holding the paths for value locations
@@ -36,4 +50,11 @@ class ExcelCellPath(object):
         :return: None (modifies internal state to have all paths accounted for)
         '''
 
-        
+
+
+    def add_attributes_to_graph(self, obj):
+        '''
+        Helper method to recurse a class
+        :param obj:
+        :return:
+        '''
