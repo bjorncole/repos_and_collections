@@ -30,6 +30,10 @@ class XMICollectionSet(object):
 
         # transform found packages into collections
 
+        # the general strategy should be to recurse into all owned meta-attributes of a given object,
+        # live-linking the appropriate objects as Python objects and posting them to the collection
+        # to provide id references to non-owned meta-attribute fields
+
         for package in package_list:
             model_collection = None
             for attribute in package.attrib.keys():
