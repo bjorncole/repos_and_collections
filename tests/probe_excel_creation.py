@@ -1,14 +1,18 @@
 from repos_and_collections.excel_objects import ExcelCollectionSet
 from pprint import PrettyPrinter
-from deep_metamodeling.metamodels.m2_uml import Class, Property, Association, AssociationClass, CompositionGraph
+from deep_metamodeling.metamodels.m2_uml import Class, Property, ValueType, CompositionGraph
 from repos_and_collections.collections import Collection
 from repos_and_collections.excel_objects import ExcelCollection
 import networkx as nx
+import openpyxl as xl
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment, Border, Font, Side
+from openpyxl.comments import Comment
 
 def main():
 
     '''
-    Paths, etc. expect this to be run from tests directory on CLI
+    A test of the facilities to project a UML model into Excel as a tree of nested cells with names
     :return:
     '''
 
@@ -20,8 +24,9 @@ def main():
 
     pp = PrettyPrinter(indent=2)
 
-    new_sheet = ExcelCollection()
-    new_sheet.name = 'Car Data'
+    xl_collection = ExcelCollection()
+    xl_collection.row_headers = False
+    xl_collection.name = 'Car Data'
 
     # Make up some fake UML data
 
@@ -37,6 +42,17 @@ def main():
     class4.name = 'Tire'
     class5.name = 'Belt'
 
+    vt1 = ValueType()
+    vt2 = ValueType()
+
+    vt1.name = "inches"
+    vt1.unit = 'in'
+    vt1.quantity_kind = 'length'
+
+    vt2.name = "PSI"
+    vt2.unit = 'psi'
+    vt2.quantity_kind = 'pressure'
+
     prop1 = Property()
     prop2 = Property()
     prop3 = Property()
@@ -46,16 +62,18 @@ def main():
     prop7 = Property()
     prop8 = Property()
     prop9 = Property()
+    prop10 = Property()
 
     prop1.name = 'front right'
     prop2.name = 'front left'
     prop3.name = 'rear right'
     prop4.name = 'rear left'
     prop5.name = 'diameter'
-    prop6.name = 'radius'
+    prop6.name = 'thickness'
     prop7.name = 'hub'
     prop8.name = 'tire'
     prop9.name = 'belt'
+    prop10.name = 'pressure'
 
     class1.owned_attribute.append(prop1)
     class1.owned_attribute.append(prop2)
@@ -68,21 +86,25 @@ def main():
     class2.owned_attribute.append(prop8)
 
     class4.owned_attribute.append(prop9)
+    class4.owned_attribute.append(prop10)
 
     prop1.type_.append(class2)
     prop2.type_.append(class2)
     prop3.type_.append(class2)
     prop4.type_.append(class2)
 
+    prop5.type_.append(vt1)
+    prop6.type_.append(vt1)
+
     prop7.type_.append(class3)
     prop8.type_.append(class4)
-    prop4.type_.append(class5)
+    prop9.type_.append(class5)
 
-    test_graph = CompositionGraph(class1)
+    prop10.type_.append(vt2)
 
-    pp.pprint(list(test_graph.comp_graph.edges()))
+    starting_class = class1
 
-    pp.pprint(list(nx.topological_sort(test_graph.comp_graph)))
+    test_graph = CompositionGraph(starting_class)
 
     pp.pprint(nx.out_degree_centrality(test_graph.comp_graph))
 
@@ -92,35 +114,25 @@ def main():
         if val == 0.0:
             leaf_list.append(key)
 
-    path_dict = {}
+    xl_collection.add_graph(test_graph.comp_graph,
+                            starting_class.name,
+                            {starting_class.name : {'type_': starting_class.name}})
 
-    for leaf in leaf_list:
-        for tree_path in list(nx.all_shortest_paths(test_graph.comp_graph, class1.name, leaf)):
-            path_builder = ''
-            for indx, step in enumerate(tree_path):
-                if indx == 0:
-                    path_builder = step
-                else:
-                    path_builder = path_builder + '.' + step
+    xl_collection.build_cell_dict()
 
-            path_dict.update({path_builder: tree_path})
+    for grph in xl_collection.graphs:
+        pp.pprint(grph.path_dict)
 
-    pp.pprint(path_dict)
+    wb = xl.Workbook()
+    sht = wb.active
+    sht.title = xl_collection.name
 
-    new_sheet.add_graph(test_graph.comp_graph, class1.name)
+    xl_collection.build_sheet(sht, test_graph)
 
-    new_sheet.set_cells()
-
-    #for child in root:
-    #    split_tag = etree.QName(child.tag)
-    #    if split_tag.localname == 'Model':
-    #        # need something recursive here
-    #        for next_child in child:
-    #            split_tag = etree.QName(next_child.tag)
-    #            print(split_tag.localname)
-    #            pp.pprint(next_child.attrib)
+    wb.save('TestWorkbook.xlsx')
 
 if __name__ == "__main__":
     # run test from command line
 
     main()
+
