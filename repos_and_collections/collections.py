@@ -91,6 +91,30 @@ class Collection(object):
         :return: True for constraints satisfied, False otherwise
         '''
 
+        # Check that each entry in the id to object map appears in other two collections
+
+        all_found = True
+
+        for id_found in self.id_to_object_map:
+            obj_found = self.id_to_object_map[id_found]
+            obj_hex = hex(id(obj_found))
+            if not(obj_hex in self.object_to_id_map and obj_found in self.collected_objects):
+                all_found = False
+
+        # Check that each entry in the hex map has a live object related to it
+
+        hex_all_found = True
+
+        for hex_found in self.object_to_id_map:
+            id_found = self.object_to_id_map[hex_found]
+            obj_found = self.id_to_object_map[id_found]
+
+            if not(obj_found in self.collected_objects):
+                hex_all_found = False
+
+        return all_found and hex_all_found
+
+
     def resolve_references(self, id_of_obj_to_resolve):
         '''
         Look at all properties in an object and resolve them to in-memory links via the
