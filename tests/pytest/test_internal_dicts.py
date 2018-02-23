@@ -1,5 +1,6 @@
 from repos_and_collections.collections import Collection
-from .fixture_data_generator1 import create_some_objects
+from .fixture_data_generator1 import create_some_objects, create_some_objects_with_properties, \
+    create_some_objects_with_properties_id
 import sys
 
 def dumb_function(x):
@@ -143,3 +144,51 @@ def test_del_from_collection_fixed_id():
     assert dummy_LR_wheel in tested_collection.collected_objects
     assert dummy_car not in tested_collection.collected_objects
     assert dummy_RF_wheel not in tested_collection.collected_objects
+
+def test_del_from_collection_fixed_id():
+    '''
+    Removing an item from the dictionary should drop the key that is
+    identifier and a value that is the new object, also remove object from internal list
+    :return: None
+    '''
+
+    module = sys.modules[__name__]
+
+    working_dict = create_some_objects_with_properties_id()
+
+    for name, value in working_dict.items():
+        setattr(module, name, value)
+
+    tested_collection = Collection()
+
+    tested_collection.add_object_to_collection_with_id(dummy_car, 'xyz_car')
+
+    tested_collection.add_object_to_collection_with_id(dummy_LR_wheel, 'xyz_LR')
+    tested_collection.add_object_to_collection_with_id(dummy_LF_wheel, 'xyz_LF')
+    tested_collection.add_object_to_collection_with_id(dummy_RR_wheel, 'xyz_RR')
+    tested_collection.add_object_to_collection_with_id(dummy_RF_wheel, 'xyz_RF')
+
+    tested_collection.add_object_to_collection_with_id(dummy_grocery1, 'DG1')
+    tested_collection.add_object_to_collection_with_id(dummy_grocery2, 'DG2')
+
+    print(tested_collection.dump_obj_as_dict('xyz_car'))
+
+    tested_collection.resolve_references('xyz_car')
+
+    print(tested_collection.dump_obj_as_dict('xyz_car'))
+
+    print(tested_collection.live_link_reverse_lookup)
+
+    assert len(tested_collection) == 7
+    assert len(tested_collection.collected_objects) == 7
+
+    tested_collection.remove_object_from_collection('xyz_LF')
+    tested_collection.remove_object_from_collection('xyz_RF')
+
+    print(tested_collection.dump_obj_as_dict('xyz_car'))
+
+    tested_collection.dereference_links('xyz_car')
+
+    assert len(tested_collection) == 5
+    assert len(tested_collection.collected_objects) == 5
+

@@ -14,6 +14,7 @@ class Collection(object):
         self.id_to_object_map = {}
         self.object_to_id_map = {}
         self.collected_objects = []
+        self.live_link_reverse_lookup = {}
         self.name = ''
 
     def __len__(self):
@@ -77,10 +78,45 @@ class Collection(object):
 
         object_to_pull = self.id_to_object_map[id_to_remove]
 
+        # need to use the reverse directory to return live references to UUID's
+
+        if (id_to_remove in self.live_link_reverse_lookup):
+            for live_ref in self.live_link_reverse_lookup[id_to_remove]:
+
+                obj = self.id_to_object_map[live_ref]
+
+                for attr in inspect.getmembers(obj):
+                    if attr[0][0] != '_' and not isinstance(attr[1], UUID) and not isinstance(attr[1], str):
+                        if not isinstance(attr[1], list):
+                            try:
+                                id_to_deref_to = self.object_to_id_map[hex(id(attr[1]))]
+                                if (id_to_remove == id_to_deref_to):
+                                    obj.__setattr__(attr[0], id_to_deref_to)
+
+                            except KeyError:
+                                pass
+                        else:
+                            new_list = copy.copy(attr[1])
+                            touched = False
+                            for item in attr[1]:
+                                if not (isinstance(item, UUID) or isinstance(item, str)):
+                                    try:
+                                        id_to_deref_to = self.object_to_id_map[hex(id(item))]
+                                        if (id_to_remove == id_to_deref_to):
+                                            new_list.append(id_to_deref_to)
+                                            new_list.remove(item)
+                                            touched = True
+                                    # if general strings are accepted, they may not be in the map
+                                    except KeyError:
+                                        pass
+                            if touched:
+                                obj.__setattr__(attr[0], new_list)
+
         del self.id_to_object_map[id_to_remove]
         del self.object_to_id_map[hex(id(object_to_pull))]
 
         self.collected_objects.remove(object_to_pull)
+
 
     def check_internal_constraints(self):
         '''
@@ -128,13 +164,17 @@ class Collection(object):
         for attr in inspect.getmembers(obj):
             if attr[0][0] != '_' and attr[0] != 'name' and attr[0] != 'literals_cache' \
                     and attr[0] != 'references_cache' and (isinstance(attr[1], UUID) \
-                    or isinstance(attr[1], str) or isinstance(attr[1], list)):
+                                                                   or isinstance(attr[1], str) or isinstance(
+                attr[1], list)):
                 if not isinstance(attr[1], list):
-
                     try:
                         print('Looking to resolve id ' + str(attr[1]) + ' for property ' + attr[0])
                         obj_to_resolve = self.id_to_object_map[attr[1]]
                         obj.__setattr__(attr[0], obj_to_resolve)
+                        if (attr[1] in self.live_link_reverse_lookup):
+                            self.live_link_reverse_lookup[attr[1]].append(id_of_obj_to_resolve)
+                        else:
+                            self.live_link_reverse_lookup.update({attr[1]: [id_of_obj_to_resolve]})
                     # if general strings are accepted, they may not be in the map
                     except KeyError:
                         print('Failed')
@@ -150,6 +190,10 @@ class Collection(object):
                                 new_list.append(obj_to_resolve)
                                 new_list.remove(item)
                                 touched = True
+                                if (item in self.live_link_reverse_lookup):
+                                    self.live_link_reverse_lookup[item].append(id_of_obj_to_resolve)
+                                else:
+                                    self.live_link_reverse_lookup.update({item: [id_of_obj_to_resolve]})
                             # if general strings are accepted, they may not be in the map
                             except KeyError:
                                 pass
@@ -168,8 +212,28 @@ class Collection(object):
 
         for attr in inspect.getmembers(obj):
             if attr[0][0] != '_' and not isinstance(attr[1], UUID) and not isinstance(attr[1], str):
-                id_to_deref_to = self.object_to_id_map[hex(id(attr[1]))]
-                obj.__setattr__(attr[0], id_to_deref_to)
+                if not isinstance(attr[1], list):
+                    try:
+                        id_to_deref_to = self.object_to_id_map[hex(id(attr[1]))]
+                        obj.__setattr__(attr[0], id_to_deref_to)
+                    except KeyError:
+                        print('Failed to match key hex ' + hex(id(attr[1])) + ' on property ' + attr[0])
+                        raise KeyError
+                else:
+                    new_list = copy.copy(attr[1])
+                    touched = False
+                    for item in attr[1]:
+                        if not (isinstance(item, UUID) or isinstance(item, str)):
+                            try:
+                                id_to_deref_to = self.object_to_id_map[hex(id(item))]
+                                new_list.append(id_to_deref_to)
+                                new_list.remove(item)
+                                touched = True
+                            # if general strings are accepted, they may not be in the map
+                            except KeyError:
+                                pass
+                    if touched:
+                        obj.__setattr__(attr[0], new_list)
 
     def dump_obj_as_dict(self, id_of_obj_to_dump):
         '''
