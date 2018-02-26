@@ -1,4 +1,6 @@
 import uuid
+import logging
+
 from uuid import UUID
 import inspect
 from lxml import etree
@@ -76,6 +78,8 @@ class Collection(object):
         '''
         # test if the removal is requested by object or by id
 
+        logging.debug('[remove_object_from_collection] Removing object with id {0} from collection'.format(id_to_remove))
+
         object_to_pull = self.id_to_object_map[id_to_remove]
 
         # need to use the reverse directory to return live references to UUID's
@@ -92,6 +96,9 @@ class Collection(object):
                                 id_to_deref_to = self.object_to_id_map[hex(id(attr[1]))]
                                 if (id_to_remove == id_to_deref_to):
                                     obj.__setattr__(attr[0], id_to_deref_to)
+                                    logging.debug('[remove_object_from_collection] Dereferencing object {0} as linked'
+                                                  ' from {1} to id {2} as single value of {3}'.
+                                                  format(attr[1], obj, id_to_deref_to, attr[0]))
 
                             except KeyError:
                                 pass
@@ -105,6 +112,10 @@ class Collection(object):
                                         if (id_to_remove == id_to_deref_to):
                                             new_list.append(id_to_deref_to)
                                             new_list.remove(item)
+                                            logging.debug(
+                                                '[remove_object_from_collection] Dereferencing object {0} as linked'
+                                                ' from {1} to id {2} in list for '.
+                                                format(attr[1], obj, id_to_deref_to, attr[0]))
                                             touched = True
                                     # if general strings are accepted, they may not be in the map
                                     except KeyError:
@@ -168,7 +179,9 @@ class Collection(object):
                 attr[1], list)):
                 if not isinstance(attr[1], list):
                     try:
-                        print('Looking to resolve id ' + str(attr[1]) + ' for property ' + attr[0])
+                        logging.debug(
+                            '[resolve_references] Looking to resolve id {0} as single value for property'.format(
+                                str(attr[1]), attr[0]))
                         obj_to_resolve = self.id_to_object_map[attr[1]]
                         obj.__setattr__(attr[0], obj_to_resolve)
                         if (attr[1] in self.live_link_reverse_lookup):
@@ -186,6 +199,9 @@ class Collection(object):
                     for item in attr[1]:
                         if (isinstance(item, UUID) or isinstance(item, str)):
                             try:
+                                logging.debug(
+                                    '[resolve_references] Looking to resolve id {0} as list value for property'.format(
+                                        str(item), attr[0]))
                                 obj_to_resolve = self.id_to_object_map[item]
                                 new_list.append(obj_to_resolve)
                                 new_list.remove(item)
@@ -216,6 +232,9 @@ class Collection(object):
                     try:
                         id_to_deref_to = self.object_to_id_map[hex(id(attr[1]))]
                         obj.__setattr__(attr[0], id_to_deref_to)
+                        logging.debug(
+                            '[dereference_links] Dereferencing link on object {0} to id {1} for single value {2}'.format(
+                                obj, id_to_deref_to, attr[0]))
                     except KeyError:
                         print('Failed to match key hex ' + hex(id(attr[1])) + ' on property ' + attr[0])
                         raise KeyError
@@ -228,6 +247,9 @@ class Collection(object):
                                 id_to_deref_to = self.object_to_id_map[hex(id(item))]
                                 new_list.append(id_to_deref_to)
                                 new_list.remove(item)
+                                logging.debug(
+                                    '[dereference_links] Dereferencing link on object {0} to id {1} for list value {2}'.format(
+                                        obj, id_to_deref_to, attr[0]))
                                 touched = True
                             # if general strings are accepted, they may not be in the map
                             except KeyError:
