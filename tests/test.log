@@ -1,0 +1,72 @@
+DEBUG:root:Running test test_add_to_collection
+DEBUG:root:Running test test_del_from_collection
+DEBUG:root:[remove_object_from_collection] Removing object with id f5b706fd-11f4-49b8-81c6-e1707960712a from collection.
+DEBUG:root:Running test test_del_from_collection_via_constraint
+DEBUG:root:[remove_object_from_collection] Removing object with id 687f8710-9c1e-4c43-8466-df71894312d3 from collection.
+DEBUG:root:Running test test_del_from_collection_fixed_id
+DEBUG:root:[resolve_references] Looking to resolve id DG1 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG2 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG3 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LF as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LR as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id Dummy Car as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_RF as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_RR as single value for property
+DEBUG:root:[remove_object_from_collection] Removing object with id xyz_LF from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object Object Dummy LF Wheel [0x25cdbd3d7b8] as linked from Object Dummy Car [0x25cdbd3d710] to id xyz_LF as single value of left_front
+DEBUG:root:[remove_object_from_collection] Removing object with id xyz_RF from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object Object Dummy RF Wheel [0x25cdbd3d7f0] as linked from Object Dummy Car [0x25cdbd3d710] to id xyz_RF as single value of right_front
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3d710] to id DG1 for list value groceries
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3d710] to id DG2 for list value groceries
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3d710] to id xyz_LR for single value left_rear
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3d710] to id xyz_RR for single value right_rear
+DEBUG:root:Running test test_del_from_collection_post_deref
+DEBUG:root:[resolve_references] Looking to resolve id DG1 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG2 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG3 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LF as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LR as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id Dummy Car as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_RF as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_RR as single value for property
+DEBUG:root:[remove_object_from_collection] Removing object with id xyz_LF from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object Object Dummy LF Wheel [0x25cdbd3dcf8] as linked from Object Dummy Car [0x25cdbd3dc50] to id xyz_LF as single value of left_front
+DEBUG:root:[remove_object_from_collection] Removing object with id xyz_RF from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object Object Dummy RF Wheel [0x25cdbd3dd30] as linked from Object Dummy Car [0x25cdbd3dc50] to id xyz_RF as single value of right_front
+DEBUG:root:[remove_object_from_collection] Removing object with id DG1 from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object ['DG3', Object Goldfish [0x25cdbd3dd68], Object Apples [0x25cdbd3dda0]] as linked from Object Dummy Car [0x25cdbd3dc50] to id DG1 in list for 
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3dc50] to id DG2 for list value groceries
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3dc50] to id xyz_LR for single value left_rear
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd3dc50] to id xyz_RR for single value right_rear
+DEBUG:root:Running test test_deref_ints_bools_nulls
+DEBUG:root:[resolve_references] Looking to resolve id DG1 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG2 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG3 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LF as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LR as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id Dummy Car as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_RR as single value for property
+DEBUG:root:[remove_object_from_collection] Removing object with id xyz_LF from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object Object Dummy LF Wheel [0x25cdbd401d0] as linked from Object Dummy Car [0x25cdbd40128] to id xyz_LF as single value of left_front
+DEBUG:root:[remove_object_from_collection] Removing object with id xyz_RF from collection.
+DEBUG:root:[remove_object_from_collection] Removing object with id DG1 from collection.
+DEBUG:root:[remove_object_from_collection] Dereferencing object ['DG3', Object Goldfish [0x25cdbd40240], Object Apples [0x25cdbd40278]] as linked from Object Dummy Car [0x25cdbd40128] to id DG1 in list for 
+DEBUG:root:Post removal state: {'right_rear': 'Object Dummy RR Wheel [0x25cdbd40160]', 'right_front': 'None', 'passengers': '4', 'groceries': "['DG3', Object Apples [0x25cdbd40278], 'DG1']", 'object_name': "'Dummy Car'", 'weight': '2000.0', 'left_rear': 'Object Dummy LR Wheel [0x25cdbd40198]', 'fourWD': 'False', 'left_front': "'xyz_LF'"}
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd40128] to id DG2 for list value groceries
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd40128] to id xyz_LR for single value left_rear
+DEBUG:root:[dereference_links] Dereferencing link on object Object Dummy Car [0x25cdbd40128] to id xyz_RR for single value right_rear
+DEBUG:root:Running test test_deref_ints_bools_nulls
+DEBUG:root:[resolve_references] Looking to resolve id DG1 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG2 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id DG3 as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id x as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id y as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id z as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id _ as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id c as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id a as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id r as list value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LF as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_LR as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id Dummy Car as single value for property
+DEBUG:root:[resolve_references] Looking to resolve id xyz_RR as single value for property

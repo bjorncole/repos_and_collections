@@ -6,6 +6,7 @@ import inspect
 from lxml import etree
 import copy
 
+
 class Collection(object):
     '''
     A collection object serves as a container of convenience for multiple Python objects.
@@ -78,7 +79,8 @@ class Collection(object):
         '''
         # test if the removal is requested by object or by id
 
-        logging.debug('[remove_object_from_collection] Removing object with id {0} from collection'.format(id_to_remove))
+        logging.debug(
+            '[remove_object_from_collection] Removing object with id {0} from collection.'.format(id_to_remove))
 
         object_to_pull = self.id_to_object_map[id_to_remove]
 
@@ -115,7 +117,7 @@ class Collection(object):
                                             logging.debug(
                                                 '[remove_object_from_collection] Dereferencing object {0} as linked'
                                                 ' from {1} to id {2} in list for '.
-                                                format(attr[1], obj, id_to_deref_to, attr[0]))
+                                                    format(attr[1], obj, id_to_deref_to, attr[0]))
                                             touched = True
                                     # if general strings are accepted, they may not be in the map
                                     except KeyError:
@@ -127,7 +129,6 @@ class Collection(object):
         del self.object_to_id_map[hex(id(object_to_pull))]
 
         self.collected_objects.remove(object_to_pull)
-
 
     def check_internal_constraints(self):
         '''
@@ -145,7 +146,7 @@ class Collection(object):
         for id_found in self.id_to_object_map:
             obj_found = self.id_to_object_map[id_found]
             obj_hex = hex(id(obj_found))
-            if not(obj_hex in self.object_to_id_map and obj_found in self.collected_objects):
+            if not (obj_hex in self.object_to_id_map and obj_found in self.collected_objects):
                 all_found = False
 
         # Check that each entry in the hex map has a live object related to it
@@ -156,11 +157,10 @@ class Collection(object):
             id_found = self.object_to_id_map[hex_found]
             obj_found = self.id_to_object_map[id_found]
 
-            if not(obj_found in self.collected_objects):
+            if not (obj_found in self.collected_objects):
                 hex_all_found = False
 
         return all_found and hex_all_found
-
 
     def resolve_references(self, id_of_obj_to_resolve):
         '''
@@ -177,7 +177,7 @@ class Collection(object):
                     and attr[0] != 'references_cache' and (isinstance(attr[1], UUID) \
                                                                    or isinstance(attr[1], str) or isinstance(
                 attr[1], list)):
-                if not isinstance(attr[1], list):
+                if not isinstance(attr[1], list) and attr[1] != id_of_obj_to_resolve:
                     try:
                         logging.debug(
                             '[resolve_references] Looking to resolve id {0} as single value for property'.format(
@@ -197,7 +197,7 @@ class Collection(object):
                     new_list = copy.copy(attr[1])
                     touched = False
                     for item in attr[1]:
-                        if (isinstance(item, UUID) or isinstance(item, str)):
+                        if (isinstance(item, UUID) or isinstance(item, str)) and item != id_of_obj_to_resolve:
                             try:
                                 logging.debug(
                                     '[resolve_references] Looking to resolve id {0} as list value for property'.format(
@@ -227,7 +227,9 @@ class Collection(object):
         obj = self.id_to_object_map[id_of_obj_to_deref]
 
         for attr in inspect.getmembers(obj):
-            if attr[0][0] != '_' and not isinstance(attr[1], UUID) and not isinstance(attr[1], str):
+            if attr[0][0] != '_' and not isinstance(attr[1], UUID) and not isinstance(attr[1], str) \
+                    and not isinstance(attr[1], int) and not isinstance(attr[1], bool) \
+                    and not isinstance(attr[1], float) and attr[1] is not None:
                 if not isinstance(attr[1], list):
                     try:
                         id_to_deref_to = self.object_to_id_map[hex(id(attr[1]))]
@@ -242,7 +244,9 @@ class Collection(object):
                     new_list = copy.copy(attr[1])
                     touched = False
                     for item in attr[1]:
-                        if not (isinstance(item, UUID) or isinstance(item, str)):
+                        if not (isinstance(item, UUID) or isinstance(item, str)
+                                        or isinstance(attr[1], int) or isinstance(attr[1], bool)
+                                        or isinstance(attr[1], float)):
                             try:
                                 id_to_deref_to = self.object_to_id_map[hex(id(item))]
                                 new_list.append(id_to_deref_to)
@@ -270,11 +274,12 @@ class Collection(object):
 
         for prop in inspect.getmembers(obj):
             if prop[0][0] != '_' and not callable(prop[1]) and \
-                prop[0] != 'literals_cache' and prop[0] != 'references_cache' and \
-                    prop[0].find('__meta') == -1:
+                            prop[0] != 'literals_cache' and prop[0] != 'references_cache' and \
+                            prop[0].find('__meta') == -1:
                 obj_dict.update({prop[0]: repr(prop[1])})
 
         return obj_dict
+
 
 class CollectionMap():
     '''
